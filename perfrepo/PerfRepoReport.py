@@ -11,11 +11,15 @@ olichtne@redhat.com (Ondrej Lichtner)
 """
 
 import textwrap
+import re
+import pprint
 from types import NoneType, StringType
 from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.Common import PerfRepoException
-from perfrepo.Common import indent
+from perfrepo.Common import indent, dot_to_dict, recursive_dict_update
+from perfrepo.Common import dict_to_dot
 
 class PerfRepoReport(PerfRepoObject):
     def __init__(self, xml=None):

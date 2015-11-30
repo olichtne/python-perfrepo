@@ -32,20 +32,17 @@ class Config():
                 "value" : "",
                 "additive" : False,
                 "action" : self.optionPlain,
-                "name" : "url"
-                }
+                "name" : "url"}
         self._options['perfrepo']['username'] = {\
                 "value" : "",
                 "additive" : False,
                 "action" : self.optionPlain,
-                "name" : "username"
-                }
+                "name" : "username"}
         self._options['perfrepo']['password'] = {\
                 "value" : "",
                 "additive" : False,
                 "action" : self.optionPlain,
-                "name" : "password"
-                }
+                "name" : "password"}
 
     def get_config(self):
         return self._options

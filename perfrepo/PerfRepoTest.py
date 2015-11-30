@@ -13,7 +13,9 @@ olichtne@redhat.com (Ondrej Lichtner)
 import textwrap
 from types import NoneType, StringType
 from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 from perfrepo.PerfRepoObject import PerfRepoObject
+from perfrepo.PerfRepoMetric import PerfRepoMetric
 from perfrepo.Common import PerfRepoException
 from perfrepo.Common import indent
 
@@ -112,14 +114,14 @@ class PerfRepoTest(PerfRepoObject):
                   name = %s
                   groupid = %s
                   description:
-                  """ % ( self._id,
-                          self._uid,
-                          self._name,
-                          self._groupid)
+                  """ % (self._id,
+                         self._uid,
+                         self._name,
+                         self._groupid)
         ret_str = textwrap.dedent(ret_str)
         ret_str += indent(self._description + "\n", 4)
         ret_str += "metrics:\n"
         for metric in self._metrics:
-            ret_str +=  indent(str(metric) + "\n", 4)
-            ret_str +=  indent("------------------------\n", 4)
+            ret_str += indent(str(metric) + "\n", 4)
+            ret_str += indent("------------------------\n", 4)
         return textwrap.dedent(ret_str)

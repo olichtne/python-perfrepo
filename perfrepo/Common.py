@@ -11,6 +11,7 @@ olichtne@redhat.com (Ondrej Lichtner)
 """
 
 import re
+import collections
 
 class PerfRepoException(Exception):
     pass
@@ -21,7 +22,7 @@ def bool_it(val):
             return True
         elif re.match("^\s*(?i)(false)", val) or re.match("^\s*(?i)(no)", val):
             return False
-    return True if int_it(val) else False
+    return True if int(val) else False
 
 def recursive_dict_update(original, update):
     for key, value in update.iteritems():
@@ -77,7 +78,9 @@ def dict_to_dot(original_dict, prefix=""):
         elif isinstance(value, tuple):
             #TODO temporary fix, tuples shouldn't be here
             if len(value) == 2:
-                return_list.append((iter_key+'.'+value[0], value[1]))
+                return_list.append((prefix+key,
+                                    "(%s, %s)" % (value[0],
+                                                  value[1]) ))
         else:
             return_list.append((prefix+key, str(value)))
     return return_list

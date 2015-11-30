@@ -10,11 +10,14 @@ __author__ = """
 olichtne@redhat.com (Ondrej Lichtner)
 """
 
+import datetime
 import textwrap
 from types import NoneType, StringType
 from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.PerfRepoValue import PerfRepoValue
+from perfrepo.PerfRepoTest import PerfRepoTest
 from perfrepo.Common import PerfRepoException
 from perfrepo.Common import indent
 

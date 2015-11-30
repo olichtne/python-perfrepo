@@ -12,11 +12,11 @@ olichtne@redhat.com (Ondrej Lichtner)
 
 import requests
 import logging
+from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.PerfRepoMetric import PerfRepoMetric
 from perfrepo.PerfRepoReport import PerfRepoReport
 from perfrepo.PerfRepoTest import PerfRepoTest
 from perfrepo.PerfRepoTestExecution import PerfRepoTestExecution
-from perfrepo.PerfRepoValue import PerfRepoValue
 
 class PerfRepoRESTAPI(object):
     '''Wrapper class for the REST API provided by PerfRepo'''
@@ -87,7 +87,7 @@ class PerfRepoRESTAPI(object):
             metric.set_id(new_id)
             if log:
                 logging.debug("POST %s success" % post_url)
-                logging.info("Obj url: %s" % self.get_obj_url(test))
+                logging.info("Obj url: %s" % self.get_obj_url(metric))
             return metric
 
     def test_delete(self, test_id, log=True):

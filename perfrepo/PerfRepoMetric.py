@@ -13,6 +13,7 @@ olichtne@redhat.com (Ondrej Lichtner)
 import textwrap
 from types import NoneType, StringType
 from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.Common import PerfRepoException
 from perfrepo.Common import indent
