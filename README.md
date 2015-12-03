@@ -3,6 +3,18 @@
 This is the repository for the Python library for working with
 [PerfRepo](https://github.com/PerfCake/PerfRepo)
 
+# Instalation
+
+To install from the git run:
+```bash
+$ ./setup.py install
+```
+
+To install from PyPI run:
+```bash
+$ pip2 install python-perfrepo
+```
+
 ## Authors
 
 * Ondrej Lichtner <olichtne@redhat.com>
