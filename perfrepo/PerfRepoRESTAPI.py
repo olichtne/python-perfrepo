@@ -31,6 +31,14 @@ class PerfRepoRESTAPI(object):
         self._session.headers['Content-Type'] = 'text/xml'
         logging.getLogger("requests").setLevel(logging.WARNING)
 
+    def connected(self):
+        try:
+            response = self._session.get(self._url)
+            response.raise_for_status()
+        except:
+            return False
+        return True
+
     def get_obj_url(self, obj):
         if not isinstance(obj, PerfRepoObject):
             return ""
