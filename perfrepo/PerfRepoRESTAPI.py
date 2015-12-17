@@ -35,6 +35,7 @@ class PerfRepoRESTAPI(object):
         try:
             response = self._session.get(self._url)
             response.raise_for_status()
+            self._session.cookies.clear_session_cookies()
         except:
             return False
         return True
