@@ -14,7 +14,7 @@ import datetime
 import textwrap
 from types import NoneType, StringType
 from xml.etree import ElementTree
-from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.PerfRepoValue import PerfRepoValue
 from perfrepo.PerfRepoTest import PerfRepoTest
@@ -34,7 +34,7 @@ class PerfRepoTestExecution(PerfRepoObject):
             self._values = []
             self._tags = []
             self._parameters = []
-        elif type(xml) is StringType or isinstance(xml, Element):
+        elif type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
                 root = ElementTree.fromstring(xml)
             else:

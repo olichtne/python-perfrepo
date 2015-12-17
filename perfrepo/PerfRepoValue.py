@@ -25,7 +25,7 @@ class PerfRepoValue(PerfRepoObject):
             self._metricName = None
             self._result = None
             self._parameters = []
-        elif type(xml) is StringType or isinstance(xml, Element):
+        elif type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
                 root = ElementTree.fromstring(xml)
             else:

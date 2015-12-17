@@ -15,7 +15,7 @@ import re
 import pprint
 from types import NoneType, StringType
 from xml.etree import ElementTree
-from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.Common import PerfRepoException
 from perfrepo.Common import indent, dot_to_dict, recursive_dict_update
@@ -29,7 +29,7 @@ class PerfRepoReport(PerfRepoObject):
             self._name = None
             self._type = None
             self._properties = {}
-        elif type(xml) is StringType or isinstance(xml, Element):
+        elif type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
                 root = ElementTree.fromstring(xml)
             else:

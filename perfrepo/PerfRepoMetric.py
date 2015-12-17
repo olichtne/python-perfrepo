@@ -13,7 +13,7 @@ olichtne@redhat.com (Ondrej Lichtner)
 import textwrap
 from types import NoneType, StringType
 from xml.etree import ElementTree
-from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.Common import PerfRepoException
 from perfrepo.Common import indent
@@ -25,7 +25,7 @@ class PerfRepoMetric(PerfRepoObject):
             self._name = None
             self._description = None
             self._comparator = None
-        elif type(xml) is StringType or isinstance(xml, Element):
+        elif type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
                 root = ElementTree.fromstring(xml)
             else:
