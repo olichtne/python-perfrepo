@@ -12,6 +12,7 @@ olichtne@redhat.com (Ondrej Lichtner)
 
 import requests
 import logging
+from urlparse import urlparse, urljoin
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.PerfRepoMetric import PerfRepoMetric
 from perfrepo.PerfRepoReport import PerfRepoReport
@@ -25,7 +26,17 @@ class PerfRepoRESTAPIException(PerfRepoException):
 class PerfRepoRESTAPI(object):
     '''Wrapper class for the REST API provided by PerfRepo'''
     def __init__(self, url, user, password):
-        self._url = url
+        self._url = urlparse(url)
+        if self._url.scheme not in ["http", "https"]:
+            msg = "PerfRepoRESTAPI supports only http or https urls!"
+            raise PerfRepoRESTAPIException(msg)
+
+        #make sure that path ends in '/' because all our paths are relative
+        #to the base directory where PerfRepo is running
+        if self._url.path[-1] != "/":
+            self._url = self._url._replace(path=self._url.path + "/")
+        self._url = self._url.geturl()
+
         self._user = user
         self._password = password
 
@@ -47,10 +58,11 @@ class PerfRepoRESTAPI(object):
     def get_obj_url(self, obj):
         if not isinstance(obj, PerfRepoObject):
             return ""
-        return self._url + obj.get_obj_url()
+        return urljoin(self._url, obj.get_obj_url())
 
     def test_get_by_id(self, test_id, log=True):
-        get_url = self._url + '/rest/test/id/%s' % test_id
+        rest_method_path = 'rest/test/id/%s' % test_id
+        get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
         if response.status_code != 200:
             if log:
@@ -62,7 +74,8 @@ class PerfRepoRESTAPI(object):
             return PerfRepoTest(response.content)
 
     def test_get_by_uid(self, test_uid, log=True):
-        get_url = self._url + '/rest/test/uid/%s' % test_uid
+        rest_method_path = 'rest/test/uid/%s' % test_uid
+        get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
         if response.status_code != 200:
             if log:
@@ -74,7 +87,8 @@ class PerfRepoRESTAPI(object):
             return PerfRepoTest(response.content)
 
     def test_create(self, test, log=True):
-        post_url = self._url + '/rest/test/create'
+        rest_method_path = 'rest/test/create'
+        post_url = urljoin(self._url, rest_method_path)
         response = self._session.post(post_url, data=test.to_xml_string())
         if response.status_code != 201:
             if log:
@@ -89,7 +103,8 @@ class PerfRepoRESTAPI(object):
             return test
 
     def test_add_metric(self, test_id, metric, log=True):
-        post_url = self._url + '/rest/test/id/%s/addMetric' % test_id
+        rest_method_path = 'rest/test/id/%s/addMetric' % test_id
+        post_url = urljoin(self._url, rest_method_path)
         response = self._session.post(post_url, data=metric.to_xml_string)
         if response.status_code != 201:
             if log:
@@ -104,7 +119,8 @@ class PerfRepoRESTAPI(object):
             return metric
 
     def test_delete(self, test_id, log=True):
-        delete_url = self._url + '/rest/test/id/%s' % test_id
+        rest_method_path = 'rest/test/id/%s' % test_id
+        delete_url = urljoin(self._url, rest_method_path)
         response = self._session.delete(delete_url)
         if response.status_code != 204:
             return False
@@ -114,7 +130,8 @@ class PerfRepoRESTAPI(object):
             return True
 
     def metric_get(self, metric_id, log=True):
-        get_url = self._url + '/rest/metric/%s' % metric_id
+        rest_method_path = 'rest/metric/%s' % metric_id
+        get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
         if response.status_code != 200:
             if log:
@@ -126,7 +143,8 @@ class PerfRepoRESTAPI(object):
             return PerfRepoMetric(response.content)
 
     def testExecution_get(self, testExec_id, log=True):
-        get_url = self._url + '/rest/testExecution/%s' % testExec_id
+        rest_method_path = 'rest/testExecution/%s' % testExec_id
+        get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
         if response.status_code != 200:
             if log:
@@ -138,7 +156,8 @@ class PerfRepoRESTAPI(object):
             return PerfRepoTestExecution(response.content)
 
     def testExecution_create(self, testExec, log=True):
-        post_url = self._url + '/rest/testExecution/create'
+        rest_method_path = 'rest/testExecution/create'
+        post_url = urljoin(self._url, rest_method_path)
         response = self._session.post(post_url, data=testExec.to_xml_string())
         if response.status_code != 201:
             if log:
@@ -153,7 +172,8 @@ class PerfRepoRESTAPI(object):
             return testExec
 
     def testExecution_delete(self, testExec_id, log=True):
-        delete_url = self._url + '/rest/testExecution/%s' % testExec_id
+        rest_method_path = 'rest/testExecution/%s' % testExec_id
+        delete_url = urljoin(self._url, rest_method_path)
         response = self._session.delete(delete_url)
         if response.status_code != 204:
             if log:
@@ -165,24 +185,26 @@ class PerfRepoRESTAPI(object):
             return True
 
     def testExecution_add_value(self, value, log=True):
-        post_url = self._url + '/rest/testExecution/addValue'
+        rest_method_path = 'rest/testExecution/addValue'
+        post_url = urljoin(self._url, rest_method_path)
         #TODO
         return self._session.post(post_url, data=value)
 
     def testExecution_get_attachment(self, attachment_id, log=True):
-        get_url = self._url + '/rest/testExecution/attachment/%s' % \
-                                                                attachment_id
+        rest_method_path = 'rest/testExecution/attachment/%s' % attachment_id
+        get_url = urljoin(self._url, rest_method_path)
         #TODO
         return self._session.get(get_url)
 
     def testExecution_add_attachment(self, testExec_id, attachment, log=True):
-        post_url = self._url + '/rest/testExecution/%s/addAttachment' % \
-                                                                testExec_id
+        rest_method_path = 'rest/testExecution/%s/addAttachment' % testExec_id
+        post_url = urljoin(self._url, rest_method_path)
         #TODO
         return self._session.post(post_url, data=attachment)
 
     def report_get_by_id(self, report_id, log=True):
-        get_url = self._url + '/rest/report/id/%s' % report_id
+        rest_method_path = 'rest/report/id/%s' % report_id
+        get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
         if response.status_code != 200:
             if log:
@@ -194,7 +216,8 @@ class PerfRepoRESTAPI(object):
             return PerfRepoReport(response.content)
 
     def report_create(self, report, log=True):
-        post_url = self._url + '/rest/report/create'
+        rest_method_path = 'rest/report/create'
+        post_url = urljoin(self._url, rest_method_path)
 
         report.set_user(self._user)
 
@@ -212,7 +235,8 @@ class PerfRepoRESTAPI(object):
             return report
 
     def report_update(self, report, log=True):
-        post_url = self._url + '/rest/report/update/%s' % report.get_id()
+        rest_method_path = 'rest/report/update/%s' % report.get_id()
+        post_url = urljoin(self._url, rest_method_path)
 
         report.set_user(self._user)
 
@@ -228,7 +252,8 @@ class PerfRepoRESTAPI(object):
             return report
 
     def report_delete_by_id(self, report_id, log=True):
-        delete_url = self._url + '/rest/report/id/%s' % report_id
+        rest_method_path = 'rest/report/id/%s' % report_id
+        delete_url = urljoin(self._url, rest_method_path)
         response = self._session.delete(delete_url)
         if response.status_code != 204:
             return False

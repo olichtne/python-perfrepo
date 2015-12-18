@@ -54,7 +54,7 @@ class PerfRepoReport(PerfRepoObject):
                                     " a string, an Element or None")
 
     def get_obj_url(self):
-        return "/reports/%s/%s" % (self._type.lower(), self._id)
+        return "reports/%s/%s" % (self._type.lower(), self._id)
 
     def _find_max_num(self, str_tmp, search_dict):
         max_num = -1

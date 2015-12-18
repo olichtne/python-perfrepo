@@ -18,7 +18,7 @@ class PerfRepoObject(object):
         pass
 
     def get_obj_url(self):
-        return "/"
+        return ""
 
     def _set_element_atrib(self, element, name, value):
         if value != None:

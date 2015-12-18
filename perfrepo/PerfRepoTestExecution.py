@@ -71,7 +71,7 @@ class PerfRepoTestExecution(PerfRepoObject):
                                     " a string, an Element or None")
 
     def get_obj_url(self):
-        return "/exec/%s" % self._id
+        return "exec/%s" % self._id
 
     def set_id(self, id):
         self._id = id

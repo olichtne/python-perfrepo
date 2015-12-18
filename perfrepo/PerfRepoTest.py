@@ -51,7 +51,7 @@ class PerfRepoTest(PerfRepoObject):
                                     " a string, an Element or None")
 
     def get_obj_url(self):
-        return "/test/%s" % self._id
+        return "test/%s" % self._id
 
     def get_id(self):
         return self._id
