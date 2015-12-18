@@ -17,6 +17,10 @@ from perfrepo.PerfRepoMetric import PerfRepoMetric
 from perfrepo.PerfRepoReport import PerfRepoReport
 from perfrepo.PerfRepoTest import PerfRepoTest
 from perfrepo.PerfRepoTestExecution import PerfRepoTestExecution
+from perfrepo.Common import PerfRepoException
+
+class PerfRepoRESTAPIException(PerfRepoException):
+    pass
 
 class PerfRepoRESTAPI(object):
     '''Wrapper class for the REST API provided by PerfRepo'''
