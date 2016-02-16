@@ -171,6 +171,21 @@ class PerfRepoRESTAPI(object):
                 logging.info("Obj url: %s" % self.get_obj_url(testExec))
             return testExec
 
+    def testExecution_update(self, testExec, log=True):
+        rest_method_path = 'rest/testExecution/update/%s' % testExec.get_id()
+        post_url = urljoin(self._url, rest_method_path)
+
+        response = self._session.post(post_url, data=testExec.to_xml_string())
+        if response.status_code != 201:
+            if log:
+                logging.debug(response.text)
+            return None
+        else:
+            if log:
+                logging.debug("UPDATE %s success" % post_url)
+                logging.info("Obj url: %s" % self.get_obj_url(testExec))
+            return testExec
+
     def testExecution_delete(self, testExec_id, log=True):
         rest_method_path = 'rest/testExecution/%s' % testExec_id
         delete_url = urljoin(self._url, rest_method_path)
