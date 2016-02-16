@@ -128,6 +128,10 @@ class TestCLI(GenericCLI):
             return -1
 
         test = self._perf_api.test_create(test)
+        if test == None:
+            print("Failed to create test!")
+            return -1
+
         print("Created test with url: %s" % self._perf_api.get_obj_url(test))
         return 0
 
@@ -191,6 +195,13 @@ class TestExecCLI(GenericCLI):
         print("                     value NAME=VAL [value NAME=value ...]", file=f)
         print("                     tags TAG,[TAG,...]", file=f)
         print("                     [param NAME=VAL ...]", file=f)
+        print("", file=f)
+        print("       %s testexec update" % sys.argv[0], file=f)
+        print("                     id ID", file=f)
+        print("                         [name NAME]", file=f)
+        print("                         [comment COMMENT]", file=f)
+        print("                         [+tags TAG[,TAG ...]]", file=f)
+        print("                         [-tags TAG[,TAG ...]]", file=f)
         print("", file=f)
         print("       %s testexec delete ID" % sys.argv[0], file=f)
 
@@ -264,6 +275,62 @@ class TestExecCLI(GenericCLI):
         print("Created TestExecution with url: %s" % self._perf_api.get_obj_url(texec))
         return 0
 
+    def _do_update(self, argv):
+        testexec_id = None
+        try:
+            if argv[1] != "id":
+                print("Parameter 'id' is required!", file=sys.stderr)
+                return -1
+            testexec_id = str(int(argv[2]))
+        except IndexError:
+            print("Parameter 'id' is required!", file=sys.stderr)
+            return -1
+        except ValueError:
+            print("Value of parameter 'id' must be a number!", file=sys.stderr)
+            return -1
+
+        testexec = self._perf_api.testExecution_get(testexec_id)
+        if testexec is None:
+            print("Invalid ID specified!", file=sys.stderr)
+            return -1
+
+        i = 3
+        while i < len(argv):
+            if argv[i] == "name":
+                testexec.set_name(argv[i+1])
+                i += 2
+            elif argv[i] == 'comment':
+                testexec.set_comment(argv[i+1])
+                i += 2
+            elif argv[i] == '+tags':
+                i += 1
+                (offset, tags) = self._parse_tags(argv[i:])
+                for tag in tags:
+                    testexec.add_tag(tag)
+                i += offset
+            elif argv[i] == '-tags':
+                i += 1
+                (offset, tags) = self._parse_tags(argv[i:])
+                for tag in tags:
+                    testexec.remove_tag(tag)
+                i += offset
+            else:
+                print("Unknown parameter '%s'!" % argv[i])
+                return -1
+
+        self._perf_api.testExecution_update(testexec)
+        return 0
+
+    def _parse_tags(self, argv):
+        i = 0
+        while i < len(argv) and \
+                  argv[i] not in [ '+tags', '-tags', 'name', 'comment' ]:
+            tag_str = argv[i]
+            tags = tag_str.split(',')
+            i += 1
+
+        return (i, tags)
+
     def _do_delete(self, argv):
         if len(argv) < 1:
             print("TestExecution delete requires an ID!")
@@ -298,6 +365,9 @@ class TestExecCLI(GenericCLI):
                 return -1
         elif argv[0] == "create":
             self._do_create(argv[1:])
+            return 0
+        elif argv[0] == "update":
+            self._do_update(argv)
             return 0
         elif argv[0] == "delete":
             self._do_delete(argv[1:])

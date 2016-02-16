@@ -134,6 +134,10 @@ class PerfRepoTestExecution(PerfRepoObject):
             return
         self._tags.append(str(tag))
 
+    def remove_tag(self, tag):
+        if str(tag) in self._tags:
+            self._tags.remove(str(tag))
+
     def get_tags(self):
         return self._tags
 
