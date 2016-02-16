@@ -128,6 +128,10 @@ class TestCLI(GenericCLI):
             return -1
 
         test = self._perf_api.test_create(test)
+        if test == None:
+            print("Failed to create test!")
+            return -1
+
         print("Created test with url: %s" % self._perf_api.get_obj_url(test))
         return 0
 
