@@ -20,6 +20,13 @@ import datetime
 import perfrepo
 from perfrepo.Config import config
 
+EC_SYNTAX = -1
+EC_NOTIMPLEMENTED = -2
+EC_NOTFOUND = -3
+EC_CREATEFAILED = -4
+EC_DELETEFAILED = -5
+EC_UPDATEFAILED = -6
+
 def usage(retval=0, f=sys.stderr):
     """
     Print usage of this app
@@ -62,7 +69,7 @@ class GenericCLI(object):
     def run(self):
         print("Not implemented yet!", file=sys.stderr)
         self.usage()
-        return -1
+        return EC_NOTIMPLEMENTED
 
 class TestCLI(GenericCLI):
     def usage(self, f=sys.stderr):
@@ -71,8 +78,8 @@ class TestCLI(GenericCLI):
         """
         print("Usage: %s test help" % sys.argv[0], file=f)
         print("", file=f)
-        print("       %s test get {ID | UID}" % sys.argv[0], file=f)
-        print("       %s test show {ID | UID}" % sys.argv[0], file=f)
+        print("       %s test get { [id] ID | [uid] UID}" % sys.argv[0], file=f)
+        print("       %s test show { [id] ID | [uid] UID}" % sys.argv[0], file=f)
         print("", file=f)
         print("       %s test create" % sys.argv[0], file=f)
         print("                     name NAME", file=f)
@@ -112,25 +119,25 @@ class TestCLI(GenericCLI):
                     continue
                 else:
                     print("Argument '%s' not supported for test create!" % argv[i])
-                    return -1
+                    return EC_SYNTAX
         except IndexError:
             print("Parameter '%s' requires a value!" % argv[i])
-            return -1
+            return EC_SYNTAX
 
         if test.get_name() is None:
             print("Name not specified!")
-            return -1
+            return EC_SYNTAX
         elif test.get_uid() is None:
             print("UID not specified!")
-            return -1
+            return EC_SYNTAX
         elif test.get_groupid() is None:
             print("GID not specified!")
-            return -1
+            return EC_SYNTAX
 
         test = self._perf_api.test_create(test)
         if test == None:
             print("Failed to create test!")
-            return -1
+            return EC_CREATEFAILED
 
         print("Created test with url: %s" % self._perf_api.get_obj_url(test))
         return 0
@@ -138,44 +145,63 @@ class TestCLI(GenericCLI):
     def _do_delete(self, argv):
         if len(argv) < 1:
             print("Test delete requires an ID!")
-            return -1
+            return EC_SYNTAX
         if self._perf_api.test_delete(argv[0]):
             print("Test deleted")
         else:
             print("Test not found")
-            return -1
+            return EC_NOTFOUND
         return 0
 
     def run(self):
         argv = self._argv
         if len(argv) == 0:
-            return -1
+            return EC_SYNTAX
         elif argv[0] == "help":
             self.usage(sys.stdout)
             return 0
         elif argv[0] in ["get", "show"]:
+            selector = None
+            test = None
+            i = 1
+
             try:
-                test_id = int(argv[1])
-                test = self._perf_api.test_get_by_id(test_id)
-                if test is None:
-                    test = self._perf_api.test_get_by_uid(test_id)
-                if test is None:
-                    print("Test not found.")
-                else:
-                    print(test)
+                if argv[i] in [ 'id', 'uid' ]:
+                    selector = argv[i]
+                    i += 1
             except IndexError:
                 print("No ID specified!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
+
+            try:
+                test_id = int(argv[i])
+                if selector != 'uid':
+                    test = self._perf_api.test_get_by_id(test_id)
+                if test is None and selector != 'id':
+                    test = self._perf_api.test_get_by_uid(argv[i])
+            except IndexError:
+                print("No ID specified!", file=sys.stderr)
+                return EC_SYNTAX
             except ValueError:
-                print("ID needs to be an integer!", file=sys.stderr)
-                return -1
+                if selector == 'id':
+                    print("ID must be number, explicit 'id' selector was "\
+                          "specified.", file=sys.stderr)
+                    return EC_SYNTAX
+                test = self._perf_api.test_get_by_uid(argv[i])
+
+            if test is None:
+                print("Test not found.")
+                return EC_NOTFOUND
+            else:
+                print(test)
+
         elif argv[0] == "create":
             self._do_create(argv[1:])
         elif argv[0] == "delete":
             self._do_delete(argv[1:])
         else:
             print("Command '%s' not implemented for Tests." % argv[0], file=sys.stderr)
-            return -1
+            return EC_NOTIMPLEMENTED
         return 0
 
 class TestExecCLI(GenericCLI):
@@ -259,17 +285,17 @@ class TestExecCLI(GenericCLI):
                     continue
                 else:
                     print("Argument '%s' not supported for test create!" % argv[i])
-                    return -1
+                    return EC_SYNTAX
         except IndexError:
             print("Parameter '%s' requires a value!" % argv[i])
-            return -1
+            return EC_SYNTAX
 
         if texec.get_name() is None:
             print("Name not specified!")
-            return -1
+            return EC_SYNTAX
         elif texec.get_testUid() is None and texec.get_testId() is None:
             print("Test ID/UID not specified!")
-            return -1
+            return EC_SYNTAX
 
         texec = self._perf_api.testExecution_create(texec)
         print("Created TestExecution with url: %s" % self._perf_api.get_obj_url(texec))
@@ -280,19 +306,19 @@ class TestExecCLI(GenericCLI):
         try:
             if argv[1] != "id":
                 print("Parameter 'id' is required!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
             testexec_id = str(int(argv[2]))
         except IndexError:
             print("Parameter 'id' is required!", file=sys.stderr)
-            return -1
+            return EC_SYNTAX
         except ValueError:
             print("Value of parameter 'id' must be a number!", file=sys.stderr)
-            return -1
+            return EC_SYNTAX
 
         testexec = self._perf_api.testExecution_get(testexec_id)
         if testexec is None:
             print("Invalid ID specified!", file=sys.stderr)
-            return -1
+            return EC_SYNTAX
 
         i = 3
         while i < len(argv):
@@ -316,7 +342,7 @@ class TestExecCLI(GenericCLI):
                 i += offset
             else:
                 print("Unknown parameter '%s'!" % argv[i])
-                return -1
+                return EC_SYNTAX
 
         self._perf_api.testExecution_update(testexec)
         return 0
@@ -334,18 +360,18 @@ class TestExecCLI(GenericCLI):
     def _do_delete(self, argv):
         if len(argv) < 1:
             print("TestExecution delete requires an ID!")
-            return -1
+            return EC_SYNTAX
         if self._perf_api.testExecution_delete(argv[0]):
             print("TestExecution removed")
         else:
             print("TestExecution not found")
-            return -1
+            return EC_NOTFOUND
         return 0
 
     def run(self):
         argv = self._argv
         if len(argv) == 0:
-            return -1
+            return EC_SYNTAX
         elif argv[0] == "help":
             self.usage(sys.stdout)
             return 0
@@ -355,14 +381,15 @@ class TestExecCLI(GenericCLI):
                 texec = self._perf_api.testExecution_get(exec_id)
                 if texec is None:
                     print("TestExecution not found.")
+                    return EC_NOTFOUND
                 else:
                     print(texec)
             except IndexError:
                 print("No ID specified!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
             except ValueError:
                 print("ID needs to be an integer!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
         elif argv[0] == "create":
             self._do_create(argv[1:])
             return 0
@@ -374,7 +401,7 @@ class TestExecCLI(GenericCLI):
             return 0
         else:
             print("Command '%s' not implemented for TestExecutions." % argv[0], file=sys.stderr)
-            return -1
+            return EC_NOTIMPLEMENTED
         return 0
 
 class ReportCLI(GenericCLI):
@@ -508,7 +535,7 @@ class ReportCLI(GenericCLI):
             except KeyError as e:
                 print("Parameter '%s' is required for a baseline!" %\
                         e.args[0])
-                return -1
+                return EC_SYNTAX
 
         for series in chart["series"]:
             try:
@@ -518,7 +545,7 @@ class ReportCLI(GenericCLI):
             except KeyError as e:
                 print("Parameter '%s' is required for a series!" %\
                         e.args[0])
-                return -1
+                return EC_SYNTAX
         return 0
 
     def _do_create(self, argv):
@@ -540,7 +567,7 @@ class ReportCLI(GenericCLI):
                     else:
                         print("Report name already specified!",
                               file=sys.stderr)
-                        return -1
+                        return EC_SYNTAX
                 elif argv[i] == "type":
                     report.set_type(argv[i+1])
                     i += 2
@@ -553,14 +580,14 @@ class ReportCLI(GenericCLI):
                 else:
                     print("Parameter '%s' not defined/implemented!" %\
                             argv[i], file=sys.stderr)
-                    return -1
+                    return EC_SYNTAX
         except IndexError:
             print("Parameter '%s' requires a value!" % argv[i])
-            return -1
+            return EC_SYNTAX
 
         if report.get_name() is None:
             print("Report name not specified!", file=sys.stderr)
-            return -1
+            return EC_SYNTAX
 
         for chart in charts:
             self._report_add_chart(report, chart)
@@ -574,19 +601,19 @@ class ReportCLI(GenericCLI):
         try:
             if argv[1] != "id":
                 print("Parameter 'id' is required!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
             report_id = str(int(argv[2]))
         except IndexError:
             print("Parameter 'id' is required!", file=sys.stderr)
-            return -1
+            return EC_SYNTAX
         except ValueError:
             print("Value of parameter 'id' must be a number!", file=sys.stderr)
-            return -1
+            return EC_SYNTAX
 
         report = self._perf_api.report_get_by_id(report_id)
         if report is None:
             print("Invalid ID specified!", file=sys.stderr)
-            return -1
+            return EC_SYNTAX
 
         i = 3
         while i < len(argv):
@@ -640,7 +667,7 @@ class ReportCLI(GenericCLI):
                                 except KeyError as e:
                                     print("Parameter '%s' is required for a series!"\
                                           % e.args[0])
-                                    return -1
+                                    return EC_SYNTAX
                             elif op == "edit":
                                 series_num = int(argv[i+1])
                                 i += 2
@@ -690,7 +717,7 @@ class ReportCLI(GenericCLI):
                                 except KeyError as e:
                                     print("Parameter '%s' is required for a baseline!"\
                                           % e.args[0])
-                                    return -1
+                                    return EC_SYNTAX
                             elif op == "edit":
                                 baseline_num = int(argv[i+1])
                                 i += 2
@@ -730,14 +757,14 @@ class ReportCLI(GenericCLI):
                     continue
             else:
                 print("Unknown parameter '%s'!" % argv[i])
-                return -1
+                return EC_SYNTAX
         self._perf_api.report_update(report)
         return 0
 
     def run(self):
         argv = self._argv
         if len(argv) == 0:
-            return -1
+            return EC_SYNTAX
         elif argv[0] == "help":
             self.usage(sys.stdout)
             return 0
@@ -745,13 +772,17 @@ class ReportCLI(GenericCLI):
             try:
                 report_id = int(argv[1])
                 report = self._perf_api.report_get_by_id(report_id)
-                print(report)
+                if report is None:
+                    print("Report not found.")
+                    return EC_NOTFOUND
+                else:
+                    print(report)
             except IndexError:
                 print("No ID specified!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
             except ValueError:
                 print("ID needs to be an integer!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
         elif argv[0] in ["create"]:
             return self._do_create(argv)
         elif argv[0] in ["update"]:
@@ -764,15 +795,16 @@ class ReportCLI(GenericCLI):
                     print("Report deleted.")
                 else:
                     print("Report delete failed.")
+                    return EC_DELETEFAILED
             except IndexError:
                 print("No ID specified!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
             except ValueError:
                 print("ID needs to be an integer!", file=sys.stderr)
-                return -1
+                return EC_SYNTAX
         else:
             print("Command '%s' not implemented for Reports." % argv[0], file=sys.stderr)
-            return -1
+            return EC_NOTIMPLEMENTED
         return 0
 
 def main():
@@ -808,7 +840,7 @@ def main():
         elif sys.argv[i] in ["-h", "--help", "help"]:
             usage(0, sys.stdout)
         else:
-            usage(-1)
+            usage(EC_SYNTAX)
 
     if obj is None:
         usage(0, f=sys.stdout)
@@ -824,7 +856,7 @@ def main():
         cli = cli_classes[obj](url, username, password, sys.argv[i:])
         ret_val = cli.run()
 
-        if ret_val < 0:
+        if ret_val in [ EC_SYNTAX, EC_NOTIMPLEMENTED ]:
             cli.usage()
         return ret_val
 
