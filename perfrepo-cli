@@ -71,8 +71,8 @@ class TestCLI(GenericCLI):
         """
         print("Usage: %s test help" % sys.argv[0], file=f)
         print("", file=f)
-        print("       %s test get {ID | UID}" % sys.argv[0], file=f)
-        print("       %s test show {ID | UID}" % sys.argv[0], file=f)
+        print("       %s test get { [id] ID | [uid] UID}" % sys.argv[0], file=f)
+        print("       %s test show { [id] ID | [uid] UID}" % sys.argv[0], file=f)
         print("", file=f)
         print("       %s test create" % sys.argv[0], file=f)
         print("                     name NAME", file=f)
@@ -154,21 +154,40 @@ class TestCLI(GenericCLI):
             self.usage(sys.stdout)
             return 0
         elif argv[0] in ["get", "show"]:
+            selector = None
+            test = None
+            i = 1
+
             try:
-                test_id = int(argv[1])
-                test = self._perf_api.test_get_by_id(test_id)
-                if test is None:
-                    test = self._perf_api.test_get_by_uid(test_id)
-                if test is None:
-                    print("Test not found.")
-                else:
-                    print(test)
+                if argv[i] in [ 'id', 'uid' ]:
+                    selector = argv[i]
+                    i += 1
+            except IndexError:
+                print("No ID specified!", file=sys.stderr)
+                return -1
+
+            try:
+                test_id = int(argv[i])
+                if selector != 'uid':
+                    test = self._perf_api.test_get_by_id(test_id)
+                if test is None and selector != 'id':
+                    test = self._perf_api.test_get_by_uid(argv[i])
             except IndexError:
                 print("No ID specified!", file=sys.stderr)
                 return -1
             except ValueError:
-                print("ID needs to be an integer!", file=sys.stderr)
+                if selector == 'id':
+                    print("ID must be number, explicit 'id' selector was "\
+                          "specified.", file=sys.stderr)
+                    return -1
+                test = self._perf_api.test_get_by_uid(argv[i])
+
+            if test is None:
+                print("Test not found.")
                 return -1
+            else:
+                print(test)
+
         elif argv[0] == "create":
             self._do_create(argv[1:])
         elif argv[0] == "delete":
