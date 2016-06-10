@@ -69,6 +69,9 @@ class PerfRepoReport(PerfRepoObject):
         return max_num
 
     def get_chart(self, chart_num):
+        if chart_num is None:
+            chart_num = self._find_max_num("chart", self._properties)
+
         chart_name = "chart%d" % chart_num
         for key, chart in self._properties.items():
             if key == chart_name:
