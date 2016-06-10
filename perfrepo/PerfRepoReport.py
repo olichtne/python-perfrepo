@@ -223,6 +223,9 @@ class PerfRepoReport(PerfRepoObject):
         if chart is None:
             return None
 
+        if series_num is None:
+            series_num = self._find_max_num("series", chart)
+
         series_name = "series%d" % int(series_num)
         for key, item in chart.items():
             if key == series_name:
