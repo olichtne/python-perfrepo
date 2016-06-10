@@ -232,6 +232,17 @@ class PerfRepoReport(PerfRepoObject):
                 return item
         return None
 
+    def get_series_list(self, chart_num):
+        chart = self.get_chart(chart_num)
+        if chart is None:
+            return None
+
+        series = []
+        for key, item in chart.items():
+            if re.match("series\d+", key):
+                series.append(item)
+        return series
+
     def del_series(self, chart_num, series_num):
         if chart_num is None:
             chart_num = self._find_max_num("chart", self._properties)
