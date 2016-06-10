@@ -40,6 +40,8 @@ class PerfRepoRESTAPI(object):
         self._user = user
         self._password = password
 
+        self._version = None
+
         self._session = requests.Session()
         self._session.auth = (self._user, self._password)
         self._session.stream = True
@@ -47,18 +49,29 @@ class PerfRepoRESTAPI(object):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
     def connected(self):
-        try:
-            response = self._session.get(self._url)
-            response.raise_for_status()
-            self._session.cookies.clear_session_cookies()
-        except:
+        if self.get_version():
+            return True
+        else:
             return False
-        return True
 
     def get_obj_url(self, obj):
         if not isinstance(obj, PerfRepoObject):
             return ""
         return urljoin(self._url, obj.get_obj_url())
+
+    def get_version(self, log=True):
+        rest_method_path = 'rest/info/version'
+        get_url = urljoin(self._url, rest_method_path)
+        response = self._session.get(get_url)
+        if response.status_code != 200:
+            if log:
+                logging.debug(response.text)
+            return None
+        else:
+            self._version = response.text
+            if log:
+                logging.debug("GET %s success" % get_url)
+            return self._version
 
     def test_get_by_id(self, test_id, log=True):
         rest_method_path = 'rest/test/id/%s' % test_id
