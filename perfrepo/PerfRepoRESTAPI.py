@@ -33,7 +33,7 @@ class PerfRepoRESTAPI(object):
 
         #make sure that path ends in '/' because all our paths are relative
         #to the base directory where PerfRepo is running
-        if self._url.path[-1] != "/":
+        if self._url.path == "" or self._url.path[-1] != "/":
             self._url = self._url._replace(path=self._url.path + "/")
         self._url = self._url.geturl()
 
