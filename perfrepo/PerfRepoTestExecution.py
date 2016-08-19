@@ -161,7 +161,7 @@ class PerfRepoTestExecution(PerfRepoObject):
         for param in self._parameters:
             param_elem = ElementTree.SubElement(parameters, 'parameter')
             self._set_element_atrib(param_elem, "name", param[0])
-            self._set_element_atrib(param_elem, "value", param[1])
+            self._set_element_atrib(param_elem, "value", str(param[1]))
 
         tags = ElementTree.SubElement(root, 'tags')
         for tag in self._tags:
