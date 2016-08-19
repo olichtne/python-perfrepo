@@ -132,11 +132,11 @@ class PerfRepoTestExecution(PerfRepoObject):
     def add_tag(self, tag):
         if tag is None:
             return
-        self._tags.append(str(tag))
+        self._tags.append(tag)
 
     def remove_tag(self, tag):
-        if str(tag) in self._tags:
-            self._tags.remove(str(tag))
+        if tag in self._tags:
+            self._tags.remove(tag)
 
     def get_tags(self):
         return self._tags
@@ -166,7 +166,7 @@ class PerfRepoTestExecution(PerfRepoObject):
         tags = ElementTree.SubElement(root, 'tags')
         for tag in self._tags:
             tag_elem = ElementTree.SubElement(tags, 'tag')
-            self._set_element_atrib(tag_elem, "name", tag)
+            self._set_element_atrib(tag_elem, "name", str(tag))
 
         values = ElementTree.SubElement(root, 'values')
         for value in self._values:
