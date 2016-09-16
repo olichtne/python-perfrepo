@@ -49,10 +49,12 @@ class PerfRepoRESTAPI(object):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
     def connected(self):
-        if self.get_version():
-            return True
-        else:
-            return False
+        try:
+            if self.get_version():
+                return True
+        except:
+            pass
+        return False
 
     def get_obj_url(self, obj):
         if not isinstance(obj, PerfRepoObject):
