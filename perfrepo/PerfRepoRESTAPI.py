@@ -48,6 +48,10 @@ class PerfRepoRESTAPI(object):
         self._session.headers['Content-Type'] = 'text/xml'
         logging.getLogger("requests").setLevel(logging.WARNING)
 
+    def set_retries(self, max_retries = 0):
+        adapter = requests.adapters.HTTPAdapter(max_retries=max_retries)
+        s.mount(self._url.scheme+'://', adapter)
+
     def connected(self):
         try:
             if self.get_version():
