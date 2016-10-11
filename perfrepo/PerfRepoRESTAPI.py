@@ -50,7 +50,8 @@ class PerfRepoRESTAPI(object):
 
     def set_retries(self, max_retries = 0):
         adapter = requests.adapters.HTTPAdapter(max_retries=max_retries)
-        self._session.mount(self._url.scheme+'://', adapter)
+        scheme = urlparse(self._url).scheme
+        self._session.mount(scheme+'://', adapter)
 
     def connected(self):
         try:
