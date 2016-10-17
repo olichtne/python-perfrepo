@@ -47,7 +47,10 @@ class PerfRepoTestExecution(PerfRepoObject):
             self._started = root.get("started")
             self._testId = root.get("testId")
             self._testUid = root.get("testUid")
-            self._comment = root.find("comment").text
+            if len(root.find("comment")):
+                self._comment = root.find("comment").text
+            else:
+                self._comment = ""
 
             self._values = []
             for value in root.find("values"):
