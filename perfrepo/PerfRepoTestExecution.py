@@ -202,3 +202,114 @@ class PerfRepoTestExecution(PerfRepoObject):
             ret_str +=  indent(str(val) + "\n", 4)
             ret_str +=  indent("------------------------\n", 4)
         return textwrap.dedent(ret_str)
+
+class PerfRepoTestExecutionSearch():
+    def __init__(self, xml=None):
+        self._ids = None
+        self._testUid = None
+        self._testname = None
+        self._tags = []
+        self._parameters = []
+
+        if type(xml) is StringType or iselement(xml):
+            if type(xml) is StringType:
+                root = ElementTree.fromstring(xml)
+            else:
+                root = xml
+            if root.tag != "test-execution-search":
+                raise PerfRepoException("Invalid xml.")
+
+            elem_ids = root.find("ids")
+            if elem_ids is not None:
+                ids=[]
+                for id in elem_ids:
+                    ids.append(id.text)
+                self.set_ids(ids)
+
+            self._testname = root.get("test-name")
+            self._testUid = root.get("test-uid")
+            elem_tags = root.find("tags")
+            if elem_tags is not None and elem_tags.text is not None:
+                tags = root.find("tags").text
+                self._tags = tags.split()
+
+            params = root.find("parameters")
+            for param in params.findall("parameter"):
+                pname = param.find("name")
+                pvalue = param.find("value")
+                self.add_parameter(pname.text, pvalue.text)
+
+    def set_ids(self, ids):
+        self._ids = ids
+
+    def get_ids(self):
+        return self._ids
+
+    def set_testName(self, testname):
+        self._testname = testname
+
+    def get_testName(self):
+        return self._testname
+
+    def set_testUid(self, testUid):
+        if isinstance(testUid, PerfRepoTest):
+            self._testUid = testUid.get_uid()
+        else:
+            self._testUid = testUid
+
+    def get_testUid(self):
+        return self._testUid
+
+    def add_tag(self, tag):
+        if tag is None:
+            return
+        self._tags.append(tag)
+
+    def remove_tag(self, tag):
+        if tag is None:
+            return
+        self._tags.remove(tag)
+
+    def get_tags(self):
+        return self._tags
+
+    def add_parameter(self, name, value):
+        self._parameters.append((name, value))
+
+    def get_parameters(self):
+        return self._parameters
+
+    def to_xml(self):
+        root = Element('test-execution-search')
+
+        if self._testname:
+            sub = ElementTree.SubElement(root, 'test-name')
+            sub.text = self._testname
+
+        if self._ids:
+            sub_ids = ElementTree.SubElement(root, 'ids')
+            for i in self._ids:
+                sub = ElementTree.SubElement(sub_ids, 'id')
+                sub.text = str(i)
+
+        if self.get_testUid():
+            sub = ElementTree.SubElement(root, 'test-uid')
+            sub.text = self._testUid
+
+        parameters = ElementTree.SubElement(root, 'parameters')
+        for param in self._parameters:
+            param_elem = ElementTree.SubElement(parameters, 'parameter')
+            sub = ElementTree.SubElement(param_elem, 'name')
+            sub.text = param[0]
+            sub = ElementTree.SubElement(param_elem, "value")
+            sub.text = str(param[1])
+
+        if len(self._tags):
+            tags_str = ""
+            for tag in self._tags:
+                tags_str += " %s" % str(tag)
+
+            tags = ElementTree.SubElement(root, 'tags')
+            tags.text = tags_str
+
+        return ElementTree.tostring(root)

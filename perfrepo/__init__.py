@@ -2,6 +2,7 @@ from perfrepo.Common import PerfRepoException
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.PerfRepoTest import PerfRepoTest
 from perfrepo.PerfRepoTestExecution import PerfRepoTestExecution
+from perfrepo.PerfRepoTestExecution import PerfRepoTestExecutionSearch
 from perfrepo.PerfRepoMetric import PerfRepoMetric
 from perfrepo.PerfRepoReport import PerfRepoReport
 from perfrepo.PerfRepoValue import PerfRepoValue
