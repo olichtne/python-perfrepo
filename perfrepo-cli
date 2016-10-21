@@ -74,7 +74,7 @@ class GenericCLI(object):
 class TestCLI(GenericCLI):
     def usage(self, f=sys.stderr):
         """
-        Print usage for the report object
+        Print usage for the Test object
         """
         print("Usage: %s test help" % sys.argv[0], file=f)
         print("", file=f)
@@ -207,7 +207,7 @@ class TestCLI(GenericCLI):
 class TestExecCLI(GenericCLI):
     def usage(self, f=sys.stderr):
         """
-        Print usage for the report object
+        Print usage for the TestExecution object
         """
         print("Usage: %s texec help" % sys.argv[0], file=f)
         print("", file=f)
@@ -460,7 +460,7 @@ class TestExecCLI(GenericCLI):
 class ReportCLI(GenericCLI):
     def usage(self, f=sys.stderr):
         """
-        Print usage for the report object
+        Print usage for the Report object
         """
         print("Usage: %s report help" % sys.argv[0], file=f)
         print("", file=f)
