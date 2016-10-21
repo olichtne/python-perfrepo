@@ -229,6 +229,13 @@ class TestExecCLI(GenericCLI):
         print("                         [+tags TAG[,TAG ...]]", file=f)
         print("                         [-tags TAG[,TAG ...]]", file=f)
         print("", file=f)
+        print("       %s testexec search" % sys.argv[0], file=f)
+        print("                         [ids ID[,ID]]", file=f)
+        print("                         [testuid UID]", file=f)
+        print("                         [testname NAME]", file=f)
+        print("                         [tags TAG[,TAG ...]]", file=f)
+        print("                         [param NAME=VAL]", file=f)
+        print("", file=f)
         print("       %s testexec delete ID" % sys.argv[0], file=f)
 
     def _do_create(self, argv):
@@ -347,6 +354,49 @@ class TestExecCLI(GenericCLI):
         self._perf_api.testExecution_update(testexec)
         return 0
 
+    def _do_search(self, argv):
+        i = 1
+
+        search_criteria = perfrepo.PerfRepoTestExecutionSearch()
+
+        # TODO: group, order-by, limit-from, how-many,
+        #       executed-before, executed-after
+
+        while i < len(argv):
+            if argv[i] == "ids":
+                ids = argv[i+1].split(',')
+                search_criteria.set_ids(ids)
+                i += 2
+            elif argv[i] == "testuid":
+                search_criteria.set_testUid(argv[i+1])
+                i += 2
+            elif argv[i] == "testname":
+                search_criteria.set_testName(argv[i+1])
+                i += 2
+            elif argv[i] == 'tags':
+                tags = argv[i+1].split(',')
+                for tag in tags:
+                    search_criteria.add_tag(tag)
+                i += 2
+            elif argv[i] == 'param':
+                param = argv[i+1].split("=")
+                try:
+                    param_name = param[0]
+                    param_val = param[1]
+                except:
+                    print("Invalid param '%s'" % argv[i+1])
+
+                search_criteria.add_parameter(param_name, param_val)
+                i += 2
+            else:
+                print("Unknown parameter '%s'!" % argv[i])
+                return EC_SYNTAX
+
+        texecs = self._perf_api.testExecution_search(search_criteria)
+        for texec in texecs:
+            print("%s" % texec.get_id())
+        return 0
+
     def _parse_tags(self, argv):
         i = 0
         while i < len(argv) and \
@@ -395,6 +445,9 @@ class TestExecCLI(GenericCLI):
             return 0
         elif argv[0] == "update":
             self._do_update(argv)
+            return 0
+        elif argv[0] == "search":
+            self._do_search(argv)
             return 0
         elif argv[0] == "delete":
             self._do_delete(argv[1:])
