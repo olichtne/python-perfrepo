@@ -19,6 +19,7 @@ from perfrepo.PerfRepoReport import PerfRepoReport
 from perfrepo.PerfRepoTest import PerfRepoTest
 from perfrepo.PerfRepoTestExecution import PerfRepoTestExecution
 from perfrepo.Common import PerfRepoException
+from xml.etree import ElementTree
 
 class PerfRepoRESTAPIException(PerfRepoException):
     pass
@@ -205,6 +206,29 @@ class PerfRepoRESTAPI(object):
                 logging.debug("UPDATE %s success" % post_url)
                 logging.info("Obj url: %s" % self.get_obj_url(testExec))
             return testExec
+
+    def _parse_texec_search(self, content):
+        tree = ElementTree.fromstring(content)
+        texecs = []
+        for elem in tree.findall('testExecution'):
+            texecs.append(PerfRepoTestExecution(elem))
+
+        return texecs
+
+    def testExecution_search(self, criteria, log=True):
+        rest_method_path = 'rest/testExecution/search'
+        post_url = urljoin(self._url, rest_method_path)
+
+        response = self._session.post(post_url, data=criteria.to_xml())
+        if response.status_code != 200:
+            if log:
+                logging.debug(response.text)
+            return None
+        else:
+            if log:
+                logging.debug("SEARCH %s success" % post_url)
+            texecs = self._parse_texec_search(response.content)
+            return texecs
 
     def testExecution_delete(self, testExec_id, log=True):
         rest_method_path = 'rest/testExecution/%s' % testExec_id
