@@ -5,5 +5,6 @@ from perfrepo.PerfRepoTestExecution import PerfRepoTestExecution
 from perfrepo.PerfRepoTestExecution import PerfRepoTestExecutionSearch
 from perfrepo.PerfRepoMetric import PerfRepoMetric
 from perfrepo.PerfRepoReport import PerfRepoReport
+from perfrepo.PerfRepoReport import PerfRepoReportPermission
 from perfrepo.PerfRepoValue import PerfRepoValue
 from perfrepo.PerfRepoRESTAPI import PerfRepoRESTAPI

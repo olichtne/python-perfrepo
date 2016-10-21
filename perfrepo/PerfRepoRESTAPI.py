@@ -320,3 +320,18 @@ class PerfRepoRESTAPI(object):
             if log:
                 logging.debug("DELETE %s success" % delete_url)
             return True
+
+    def report_add_permission(self, permission, log=True):
+        report_id = permission.get_report_id()
+        rest_method_path = 'rest/report/id/%s/addPermission' % report_id
+        post_url = urljoin(self._url, rest_method_path)
+        response = self._session.post(post_url, data=permission.to_xml_string())
+        print response.text
+        if response.status_code != 201:
+            if log:
+                logging.debug(response.text)
+            return None
+        else:
+            if log:
+                logging.debug("POST %s success" % post_url)
+            return permission

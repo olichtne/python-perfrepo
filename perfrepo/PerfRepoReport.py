@@ -374,3 +374,133 @@ class PerfRepoReport(PerfRepoObject):
         ret_str = textwrap.dedent(ret_str)
         ret_str += str_props
         return textwrap.dedent(ret_str)
+
+class PerfRepoReportPermission(PerfRepoObject):
+    def __init__(self, xml=None):
+        self._report_id = None
+        self._access_type = None
+        self._access_level = None
+        self._user_id = None
+        self._group_id = None
+        if type(xml) is NoneType:
+            pass
+        elif type(xml) is StringType or iselement(xml):
+            if type(xml) is StringType:
+                root = ElementTree.fromstring(xml)
+            else:
+                root = xml
+            if root.tag != "report-permission":
+                raise PerfRepoException("Invalid xml.")
+
+            self._report_id = root.get("report-id").text
+            self._access_type = root.get("access-type").text
+            self._access_level = root.get("access-level").text
+
+            try:
+                self._user_id = root.get("user-id").text
+            except:
+                self._user_id = None
+            try:
+                self._group_id = root.get("group-id").text
+            except:
+                self._group_id = None
+
+        else:
+            raise PerfRepoException("Parameter xml must be"\
+                                    " a string, an Element or None")
+
+    def validate(self):
+        if self._report_id is None:
+            raise PerfRepoException("report id must be specified!")
+
+        if self._access_level is None:
+            raise PerfRepoException("access level must be specified!")
+
+        if self._access_type is None:
+            raise PerfRepoException("access level must be specified!")
+
+        if self._access_level == "GROUP" and self._group_id == None:
+            raise PerfRepoException("When access level is GROUP, "\
+                                    "group id must be specified!")
+
+        if self._access_level == "USER" and self._user_id == None:
+            raise PerfRepoException("When access level is GROUP, "\
+                                    "user id must be specified!")
+
+    def set_report_id(self, report_id):
+        try:
+            self._report_id = int(report_id)
+        except:
+            raise PerfRepoException("report id must be an integer")
+
+    def set_access_type(self, access_type):
+        if access_type not in ["READ", "WRITE"]:
+            raise PerfRepoException("Possible access type values: READ, WRITE")
+        self._access_type = access_type
+
+    def set_access_level(self, access_level):
+        if access_level not in ["USER", "GROUP", "PUBLIC"]:
+            raise PerfRepoException("Possible access level values: "\
+                                    "USER, GROUP, PUBLIC")
+        self._access_level = access_level
+
+    def set_user_id(self, user_id):
+        self._user_id = int(user_id)
+
+    def set_group_id(self, group_id):
+        self._group_id = int(group_id)
+
+    def get_report_id(self):
+        return self._report_id
+
+    def get_access_type(self):
+        return self._access_type
+
+    def get_access_level(self):
+        return self._access_level
+
+    def get_user_id(self):
+        return self._user_id
+
+    def get_group_id(self):
+        return self._group_id
+
+    def to_xml(self):
+        self.validate()
+
+        root = Element('report-permission')
+
+        id_elem = ElementTree.SubElement(root, 'report-id')
+        id_elem.text = str(self._report_id)
+
+        access_type_elem = ElementTree.SubElement(root, 'access-type')
+        access_type_elem.text = str(self._access_type)
+
+        access_level_elem = ElementTree.SubElement(root, 'access-level')
+        access_level_elem.text = str(self._access_level)
+
+        if self._access_level == "GROUP":
+            group_id_elem = ElementTree.SubElement(root, 'group-id')
+            group_id_elem.text = str(self._group_id)
+
+        if self._access_level == "USER":
+            user_id_elem = ElementTree.SubElement(root, 'user-id')
+            user_id_elem.text = str(self._user_id)
+        return root
+
+    def __str__(self):
+        str_props = pprint.pformat(self._properties)
+        ret_str = """\
+                  report_id = %s
+                  access_level = %s
+                  access_type = %s
+                  user_id = %s
+                  group_id = %s
+                  """ % ( self._report_id,
+                          self._acess_level,
+                          self._acess_type,
+                          self._user_id,
+                          self._group_id)
+        ret_str = textwrap.dedent(ret_str)
+        ret_str += str_props
+        return textwrap.dedent(ret_str)
