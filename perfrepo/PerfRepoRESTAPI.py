@@ -82,6 +82,11 @@ class PerfRepoRESTAPI(object):
             return self._version
 
     def test_get_by_id(self, test_id, log=True):
+        try:
+            int(test_id)
+        except:
+            raise PerfRepoRESTAPIException("ID must be an integer.")
+
         rest_method_path = 'rest/test/id/%s' % test_id
         get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
@@ -151,6 +156,11 @@ class PerfRepoRESTAPI(object):
             return True
 
     def metric_get(self, metric_id, log=True):
+        try:
+            int(metric_id)
+        except:
+            raise PerfRepoRESTAPIException("ID must be an integer.")
+
         rest_method_path = 'rest/metric/%s' % metric_id
         get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
@@ -164,6 +174,11 @@ class PerfRepoRESTAPI(object):
             return PerfRepoMetric(response.content)
 
     def testExecution_get(self, testExec_id, log=True):
+        try:
+            int(testExec_id)
+        except:
+            raise PerfRepoRESTAPIException("ID must be an integer.")
+
         rest_method_path = 'rest/testExecution/%s' % testExec_id
         get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
@@ -250,18 +265,33 @@ class PerfRepoRESTAPI(object):
         return self._session.post(post_url, data=value)
 
     def testExecution_get_attachment(self, attachment_id, log=True):
+        try:
+            int(attachment_id)
+        except:
+            raise PerfRepoRESTAPIException("ID must be an integer.")
+
         rest_method_path = 'rest/testExecution/attachment/%s' % attachment_id
         get_url = urljoin(self._url, rest_method_path)
         #TODO
         return self._session.get(get_url)
 
     def testExecution_add_attachment(self, testExec_id, attachment, log=True):
+        try:
+            int(testExec_id)
+        except:
+            raise PerfRepoRESTAPIException("ID must be an integer.")
+
         rest_method_path = 'rest/testExecution/%s/addAttachment' % testExec_id
         post_url = urljoin(self._url, rest_method_path)
         #TODO
         return self._session.post(post_url, data=attachment)
 
     def report_get_by_id(self, report_id, log=True):
+        try:
+            int(report_id)
+        except:
+            raise PerfRepoRESTAPIException("ID must be an integer.")
+
         rest_method_path = 'rest/report/id/%s' % report_id
         get_url = urljoin(self._url, rest_method_path)
         response = self._session.get(get_url)
@@ -311,6 +341,11 @@ class PerfRepoRESTAPI(object):
             return report
 
     def report_delete_by_id(self, report_id, log=True):
+        try:
+            int(report_id)
+        except:
+            raise PerfRepoRESTAPIException("ID must be an integer.")
+
         rest_method_path = 'rest/report/id/%s' % report_id
         delete_url = urljoin(self._url, rest_method_path)
         response = self._session.delete(delete_url)
