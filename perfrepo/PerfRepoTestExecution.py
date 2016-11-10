@@ -47,7 +47,7 @@ class PerfRepoTestExecution(PerfRepoObject):
             self._started = root.get("started")
             self._testId = root.get("testId")
             self._testUid = root.get("testUid")
-            if len(root.find("comment")):
+            if root.find("comment") is not None:
                 self._comment = root.find("comment").text
             else:
                 self._comment = ""
