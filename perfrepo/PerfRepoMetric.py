@@ -45,7 +45,7 @@ class PerfRepoMetric(PerfRepoObject):
         return self._id
 
     def get_name(self):
-        return self._id
+        return self._name
 
     def get_description(self):
         return self._description
