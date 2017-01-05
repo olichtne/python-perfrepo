@@ -59,7 +59,7 @@ class PerfRepoReport(PerfRepoObject):
     def _find_max_num(self, str_tmp, search_dict):
         max_num = -1
         for key, item in search_dict.items():
-            match = re.match(r'%s(\d)+' % str_tmp, key)
+            match = re.match(r'%s(\d+)' % str_tmp, key)
             if match == None:
                 continue
             num = int(match.group(1))
