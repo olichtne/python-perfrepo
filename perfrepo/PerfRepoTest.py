@@ -119,7 +119,7 @@ class PerfRepoTest(PerfRepoObject):
                          self._name,
                          self._groupid)
         ret_str = textwrap.dedent(ret_str)
-        ret_str += indent(self._description + "\n", 4)
+        ret_str += indent(str(self._description) + "\n", 4)
         ret_str += "metrics:\n"
         for metric in self._metrics:
             ret_str += indent(str(metric) + "\n", 4)
