@@ -29,6 +29,7 @@ class PerfRepoReport(PerfRepoObject):
             self._name = None
             self._type = None
             self._properties = {}
+            self._permissions = []
         elif type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
                 root = ElementTree.fromstring(xml)
@@ -49,6 +50,14 @@ class PerfRepoReport(PerfRepoObject):
                 tmp_dict = dot_to_dict(value_tag.get("name"),
                                        value_tag.get("value"))
                 recursive_dict_update(self._properties, tmp_dict)
+
+            self._permissions = []
+            for entry in root.find("permissions"):
+                if entry.tag != "permission":
+                    continue
+                self._permissions.append(PerfRepoReportPermission(entry))
+                self._permissions[-1].set_report_id(self._id)
+                self._permissions[-1].validate()
         else:
             raise PerfRepoException("Parameter xml must be"\
                                     " a string, an Element or None")
@@ -341,6 +350,9 @@ class PerfRepoReport(PerfRepoObject):
     def get_user(self):
         return self._user
 
+    def get_permissions(self):
+        return self._permissions
+
     def to_xml(self):
         root = Element('report')
         self._set_element_atrib(root, 'id', self._id)
@@ -363,16 +375,24 @@ class PerfRepoReport(PerfRepoObject):
 
     def __str__(self):
         str_props = pprint.pformat(self._properties)
+        str_perms = ""
+        for perm in self._permissions:
+            str_perms += str(perm)
         ret_str = """\
-                  id = %s
-                  name = %s
-                  type = %s
+                  id = {id}
+                  name = {name}
+                  type = {type}
                   properties =
-                  """ % ( self._id,
-                          self._name,
-                          self._type)
+                  {props}
+                  permissions =
+                  {perms}
+                  """
         ret_str = textwrap.dedent(ret_str)
-        ret_str += str_props
+        ret_str = ret_str.format(id=self._id,
+                                 name=self._name,
+                                 type=self._type,
+                                 props=str_props,
+                                 perms=str_perms)
         return textwrap.dedent(ret_str)
 
 class PerfRepoReportPermission(PerfRepoObject):
@@ -389,19 +409,25 @@ class PerfRepoReportPermission(PerfRepoObject):
                 root = ElementTree.fromstring(xml)
             else:
                 root = xml
-            if root.tag != "report-permission":
+            if root.tag != "report-permission" and root.tag != "permission":
                 raise PerfRepoException("Invalid xml.")
 
-            self._report_id = root.get("report-id").text
-            self._access_type = root.get("access-type").text
-            self._access_level = root.get("access-level").text
+            self._id = root.find("id").text
 
             try:
-                self._user_id = root.get("user-id").text
+                self._report_id = root.find("report-id").text
+            except:
+                self._report_id = None
+
+            self._access_type = root.find("access-type").text
+            self._access_level = root.find("access-level").text
+
+            try:
+                self._user_id = root.find("user-id").text
             except:
                 self._user_id = None
             try:
-                self._group_id = root.get("group-id").text
+                self._group_id = root.find("group-id").text
             except:
                 self._group_id = None
 
@@ -489,18 +515,10 @@ class PerfRepoReportPermission(PerfRepoObject):
         return root
 
     def __str__(self):
-        str_props = pprint.pformat(self._properties)
-        ret_str = """\
-                  report_id = %s
-                  access_level = %s
-                  access_type = %s
-                  user_id = %s
-                  group_id = %s
-                  """ % ( self._report_id,
-                          self._acess_level,
-                          self._acess_type,
-                          self._user_id,
-                          self._group_id)
-        ret_str = textwrap.dedent(ret_str)
-        ret_str += str_props
+        ret_str = """report_id = %s, access_level = %s, access_type = %s, user_id = %s, group_id = %s"""
+        ret_str = ret_str % (self._report_id,
+                             self._access_level,
+                             self._access_type,
+                             self._user_id,
+                             self._group_id)
         return textwrap.dedent(ret_str)
