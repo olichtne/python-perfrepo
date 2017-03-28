@@ -382,9 +382,10 @@ class PerfRepoReport(PerfRepoObject):
 
     def __str__(self):
         str_props = pprint.pformat(self._properties)
-        str_perms = ""
+        str_perms = []
         for perm in self._permissions:
-            str_perms += str(perm)
+            str_perms.append(str(perm))
+        str_perms = "\n".join(str_perms)
         ret_str = """\
                   id = {id}
                   name = {name}
@@ -392,8 +393,7 @@ class PerfRepoReport(PerfRepoObject):
                   properties =
                   {props}
                   permissions =
-                  {perms}
-                  """
+                  {perms}"""
         ret_str = textwrap.dedent(ret_str)
         ret_str = ret_str.format(id=self._id,
                                  name=self._name,
