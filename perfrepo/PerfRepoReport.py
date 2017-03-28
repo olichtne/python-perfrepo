@@ -87,6 +87,13 @@ class PerfRepoReport(PerfRepoObject):
                 return chart
         return None
 
+    def get_charts(self):
+        chart_name_re = "chart(\d+)"
+        for key, chart in self._properties.items():
+            m = re.match(chart_name_re, key)
+            if m:
+                yield int(m.group(1)), chart
+
     def add_chart(self, name, test_id):
         max_chart_num = self._find_max_num("chart", self._properties)
 
