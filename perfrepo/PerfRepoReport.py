@@ -255,8 +255,9 @@ class PerfRepoReport(PerfRepoObject):
 
         series = []
         for key, item in chart.items():
-            if re.match("series\d+", key):
-                series.append(item)
+            m = re.match("series(\d+)", key)
+            if m:
+                series.append((m.group(1), item))
         return series
 
     def del_series(self, chart_num, series_num):
