@@ -210,6 +210,8 @@ class PerfRepoTestExecutionSearch():
         self._testname = None
         self._tags = []
         self._parameters = []
+        self._after = None
+        self._before = None
 
         if type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
@@ -279,6 +281,24 @@ class PerfRepoTestExecutionSearch():
     def get_parameters(self):
         return self._parameters
 
+    def set_after_date(self, date, date_format="%Y-%m-%d"):
+        try:
+            after = datetime.datetime.strptime(date, date_format)
+        except ValueError:
+            print "Failed to convert after-date"
+            return
+
+        self._after = after.isoformat()
+
+    def set_before_date(self, date, date_format="%Y-%m-%d"):
+        try:
+            before = datetime.datetime.strptime(date, date_format)
+        except ValueError:
+            print "Failed to convert before-date"
+            return
+
+        self._before = before.isoformat()
+
     def to_xml(self):
         root = Element('test-execution-search')
 
@@ -311,5 +331,13 @@ class PerfRepoTestExecutionSearch():
 
             tags = ElementTree.SubElement(root, 'tags')
             tags.text = tags_str
+
+        if self._after:
+            after = ElementTree.SubElement(root, 'executed-after')
+            after.text = self._after
+
+        if self._before:
+            before = ElementTree.SubElement(root, 'executed-before')
+            before.text = self._before
 
         return ElementTree.tostring(root)
