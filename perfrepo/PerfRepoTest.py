@@ -25,7 +25,7 @@ class PerfRepoTest(PerfRepoObject):
             self._id = None
             self._name = None
             self._uid = None
-            self._description = None
+            self._description = ""
             self._groupid = None
             self._metrics = []
         elif type(xml) is StringType or iselement(xml):
@@ -40,7 +40,10 @@ class PerfRepoTest(PerfRepoObject):
             self._name = root.get("name")
             self._uid = root.get("uid")
             self._groupid = root.get("groupId")
-            self._description = root.find("description").text
+            if root.find("description") is not None:
+                self._description = root.find("description").text
+            else:
+                self._description = ""
             self._metrics = []
             for metric in root.find("metrics"):
                 if metric.tag != "metric":
