@@ -23,7 +23,7 @@ class PerfRepoMetric(PerfRepoObject):
         if type(xml) is NoneType:
             self._id = None
             self._name = None
-            self._description = None
+            self._description = ""
             self._comparator = None
         elif type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
@@ -36,7 +36,10 @@ class PerfRepoMetric(PerfRepoObject):
             self._id = root.get("id")
             self._name = root.get("name")
             self._comparator = root.get("comparator")
-            self._description = root.find("description").text
+            if root.find("description") is not None:
+                self._description = root.find("description").text
+            else:
+                self._description = ""
         else:
             raise PerfRepoException("Parameter xml must be"\
                                     " a string, an Element or None")
