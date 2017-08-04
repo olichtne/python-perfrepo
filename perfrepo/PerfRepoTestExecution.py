@@ -212,6 +212,7 @@ class PerfRepoTestExecutionSearch():
         self._parameters = []
         self._after = None
         self._before = None
+        self._howmany = None
 
         if type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:
@@ -299,6 +300,9 @@ class PerfRepoTestExecutionSearch():
 
         self._before = before.isoformat()
 
+    def set_howmany(self, howmany):
+        self._howmany = howmany
+
     def to_xml(self):
         root = Element('test-execution-search')
 
@@ -339,5 +343,9 @@ class PerfRepoTestExecutionSearch():
         if self._before:
             before = ElementTree.SubElement(root, 'executed-before')
             before.text = self._before
+
+        if self._howmany:
+            howmany = ElementTree.SubElement(root, 'how-many')
+            howmany.text = str(self._howmany)
 
         return ElementTree.tostring(root)
