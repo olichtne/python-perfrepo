@@ -133,7 +133,7 @@ class PerfRepoTestExecution(PerfRepoObject):
                 return val
 
     def add_tag(self, tag):
-        if tag is None:
+        if tag is None or tag in self._tags:
             return
         self._tags.append(tag)
 
