@@ -12,7 +12,6 @@ olichtne@redhat.com (Ondrej Lichtner)
 
 import requests
 import logging
-from urlparse import urlparse, urljoin
 from perfrepo.PerfRepoObject import PerfRepoObject
 from perfrepo.PerfRepoMetric import PerfRepoMetric
 from perfrepo.PerfRepoReport import PerfRepoReport
@@ -20,6 +19,11 @@ from perfrepo.PerfRepoTest import PerfRepoTest
 from perfrepo.PerfRepoTestExecution import PerfRepoTestExecution
 from perfrepo.Common import PerfRepoException
 from xml.etree import ElementTree
+
+try:
+    from urlparse import urlparse, urljoin
+except:
+    from urllib.parse import urlparse, urljoin
 
 class PerfRepoRESTAPIException(PerfRepoException):
     pass

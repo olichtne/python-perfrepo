@@ -15,8 +15,12 @@ olichtne@redhat.com (Ondrej Lichtner)
 import os
 import sys
 import re
-from ConfigParser import ConfigParser
 from perfrepo.Common import bool_it
+
+try:
+    from ConfigParser import ConfigParser
+except:
+    from configparser import ConfigParser
 
 class ConfigError(Exception):
     pass
