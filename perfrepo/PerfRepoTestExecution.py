@@ -285,8 +285,7 @@ class PerfRepoTestExecutionSearch():
         try:
             after = datetime.datetime.strptime(date, date_format)
         except ValueError:
-            print "Failed to convert after-date"
-            return
+            raise PerfRepoException("Failed to convert after-date")
 
         self._after = after.isoformat()
 
@@ -294,8 +293,7 @@ class PerfRepoTestExecutionSearch():
         try:
             before = datetime.datetime.strptime(date, date_format)
         except ValueError:
-            print "Failed to convert before-date"
-            return
+            raise PerfRepoException("Failed to convert before-date")
 
         self._before = before.isoformat()
 
