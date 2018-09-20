@@ -11,7 +11,7 @@ olichtne@redhat.com (Ondrej Lichtner)
 """
 
 import textwrap
-from types import NoneType, StringType
+from types import StringType
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
@@ -21,7 +21,7 @@ from perfrepo.Common import indent
 
 class PerfRepoTest(PerfRepoObject):
     def __init__(self, xml=None):
-        if type(xml) is NoneType:
+        if xml is None:
             self._id = None
             self._name = None
             self._uid = None

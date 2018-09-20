@@ -13,7 +13,7 @@ olichtne@redhat.com (Ondrej Lichtner)
 import textwrap
 import re
 import pprint
-from types import NoneType, StringType
+from types import StringType
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
@@ -24,7 +24,7 @@ from perfrepo.Common import dict_to_dot
 class PerfRepoReport(PerfRepoObject):
     def __init__(self, xml=None):
         self._user = None
-        if type(xml) is NoneType:
+        if xml is None:
             self._id = None
             self._name = None
             self._type = None
@@ -410,7 +410,7 @@ class PerfRepoReportPermission(PerfRepoObject):
         self._access_level = None
         self._user_id = None
         self._group_id = None
-        if type(xml) is NoneType:
+        if xml is None:
             pass
         elif type(xml) is StringType or iselement(xml):
             if type(xml) is StringType:

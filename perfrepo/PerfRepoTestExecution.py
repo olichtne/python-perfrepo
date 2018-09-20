@@ -12,7 +12,7 @@ olichtne@redhat.com (Ondrej Lichtner)
 
 import datetime
 import textwrap
-from types import NoneType, StringType
+from types import StringType
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
@@ -23,7 +23,7 @@ from perfrepo.Common import indent
 
 class PerfRepoTestExecution(PerfRepoObject):
     def __init__(self, xml=None):
-        if type(xml) is NoneType:
+        if xml is None:
             self._id = None
             self._name = None
             self._started = datetime.datetime.utcnow().isoformat()
@@ -89,7 +89,7 @@ class PerfRepoTestExecution(PerfRepoObject):
         return self._name
 
     def set_started(self, date=None):
-        if isinstance(date, NoneType):
+        if date is None:
             self._started = datetime.datetime.utcnow().isoformat()
         else:
             self._started = date
