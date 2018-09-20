@@ -6,6 +6,8 @@ Licensed under the GNU General Public License, version 2 as
 published by the Free Software Foundation; see COPYING for details.
 """
 
+from __future__ import print_function
+
 __autor__ = """
 olichtne@redhat.com (Ondrej Lichtner)
 """
@@ -69,7 +71,7 @@ class Config():
         exp_path = os.path.expanduser(path)
         abs_path = os.path.abspath(exp_path)
         parser = ConfigParser(dict_type=dict)
-        print >> sys.stderr, "Loading config file '%s'" % abs_path
+        print("Loading config file '%s'" % abs_path, file=sys.stderr)
         parser.read(abs_path)
 
         sections = parser._sections
