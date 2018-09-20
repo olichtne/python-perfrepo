@@ -11,7 +11,6 @@ olichtne@redhat.com (Ondrej Lichtner)
 """
 
 import textwrap
-from types import StringType
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
@@ -25,8 +24,8 @@ class PerfRepoValue(PerfRepoObject):
             self._metricName = None
             self._result = None
             self._parameters = []
-        elif type(xml) is StringType or iselement(xml):
-            if type(xml) is StringType:
+        elif isinstance(xml, str) or isinstance(xml, bytes) or iselement(xml):
+            if isinstance(xml, str) or isinstance(xml, bytes):
                 root = ElementTree.fromstring(xml)
             else:
                 root = xml

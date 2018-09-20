@@ -12,7 +12,6 @@ olichtne@redhat.com (Ondrej Lichtner)
 
 import datetime
 import textwrap
-from types import StringType
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
@@ -34,8 +33,8 @@ class PerfRepoTestExecution(PerfRepoObject):
             self._values = []
             self._tags = []
             self._parameters = []
-        elif type(xml) is StringType or iselement(xml):
-            if type(xml) is StringType:
+        elif isinstance(xml, str) or isinstance(xml, bytes) or iselement(xml):
+            if isinstance(xml, str) or isinstance(xml, bytes):
                 root = ElementTree.fromstring(xml)
             else:
                 root = xml
@@ -214,8 +213,8 @@ class PerfRepoTestExecutionSearch():
         self._before = None
         self._howmany = None
 
-        if type(xml) is StringType or iselement(xml):
-            if type(xml) is StringType:
+        if isinstance(xml, str) or isinstance(xml, bytes) or iselement(xml):
+            if isinstance(xml, str) or isinstance(xml, bytes):
                 root = ElementTree.fromstring(xml)
             else:
                 root = xml

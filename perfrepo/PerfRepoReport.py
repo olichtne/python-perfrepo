@@ -13,7 +13,6 @@ olichtne@redhat.com (Ondrej Lichtner)
 import textwrap
 import re
 import pprint
-from types import StringType
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, iselement
 from perfrepo.PerfRepoObject import PerfRepoObject
@@ -30,8 +29,8 @@ class PerfRepoReport(PerfRepoObject):
             self._type = None
             self._properties = {}
             self._permissions = []
-        elif type(xml) is StringType or iselement(xml):
-            if type(xml) is StringType:
+        elif isinstance(xml, str) or isinstance(xml, bytes) or iselement(xml):
+            if isinstance(xml, str) or isinstance(xml, bytes):
                 root = ElementTree.fromstring(xml)
             else:
                 root = xml
@@ -412,8 +411,8 @@ class PerfRepoReportPermission(PerfRepoObject):
         self._group_id = None
         if xml is None:
             pass
-        elif type(xml) is StringType or iselement(xml):
-            if type(xml) is StringType:
+        elif isinstance(xml, str) or isinstance(xml, bytes) or iselement(xml):
+            if isinstance(xml, str) or isinstance(xml, bytes):
                 root = ElementTree.fromstring(xml)
             else:
                 root = xml
