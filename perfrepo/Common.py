@@ -25,7 +25,7 @@ def bool_it(val):
     return True if int(val) else False
 
 def recursive_dict_update(original, update):
-    for key, value in update.iteritems():
+    for key, value in update.items():
         if isinstance(value, collections.Mapping):
             r = recursive_dict_update(original.get(key, {}), value)
             original[key] = r
@@ -68,7 +68,7 @@ def list_to_dot(original_list, prefix="", key=""):
 
 def dict_to_dot(original_dict, prefix=""):
     return_list = []
-    for key, value in original_dict.iteritems():
+    for key, value in original_dict.items():
         if isinstance(value, collections.Mapping):
             sub_list = dict_to_dot(value, prefix + key + '.')
             return_list.extend(sub_list)

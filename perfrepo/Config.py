@@ -113,7 +113,7 @@ class Config():
         else:
             additive = False
 
-        for option in section.itervalues():
+        for option in section.values():
             if option["name"] == opt_name:
                 if (not option["additive"]) and additive:
                     msg = "Operator += cannot be used in option %s" % opt_name
